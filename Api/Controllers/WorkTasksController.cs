@@ -44,7 +44,7 @@ namespace Api.Controllers
         }
 
         /// <summary>
-        /// Search and filter tasks with pagination
+        /// Search and filter tasks with pagination and sorting
         /// </summary>
         [HttpPost("search")]
         public async Task<ActionResult<PaginatedResponse<WorkTaskDTO>>> SearchTasks([FromBody] WorkTaskFilterDTO filterDTO)
@@ -57,7 +57,8 @@ namespace Api.Controllers
                 DueDateFrom = filterDTO.DueDateFrom,
                 DueDateTo = filterDTO.DueDateTo,
                 PageNumber = filterDTO.PageNumber,
-                PageSize = filterDTO.PageSize
+                PageSize = filterDTO.PageSize,
+                SortBy = filterDTO.SortBy
             };
 
             var result = await Mediator.Send(query);

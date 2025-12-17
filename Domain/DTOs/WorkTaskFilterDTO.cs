@@ -1,3 +1,5 @@
+using Domain.Enums;
+
 namespace Domain.DTOs
 {
     public class WorkTaskFilterDTO
@@ -9,5 +11,6 @@ namespace Domain.DTOs
         public DateTime? DueDateTo { get; set; }
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 10;
+        public SortBy SortBy { get; set; } = SortBy.IdDesc;
     }
 }

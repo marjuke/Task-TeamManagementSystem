@@ -1,4 +1,5 @@
 using Application.Features.WorkTasks.Queries;
+using Domain.Enums;
 using FluentValidation;
 
 namespace Application.Validators
@@ -21,6 +22,9 @@ namespace Application.Validators
             RuleFor(x => x.PageSize)
                 .GreaterThan(0).WithMessage("Page size must be greater than 0.")
                 .LessThanOrEqualTo(100).WithMessage("Page size cannot exceed 100.");
+
+            RuleFor(x => x.SortBy)
+                .IsInEnum().WithMessage("Invalid sort option.");
 
             RuleFor(x => x)
                 .Custom((query, context) =>

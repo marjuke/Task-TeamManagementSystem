@@ -1,5 +1,6 @@
 using Domain.DTOs;
 using Domain;
+using Domain.Enums;
 using MediatR;
 using Persistance;
 using Microsoft.EntityFrameworkCore;
@@ -37,8 +38,8 @@ namespace Application.Features.WorkTasks.Queries
             };
 
             _logger.LogInformation(
-                "Executing task search with filters: {@FilterSummary}, Page: {PageNumber}, PageSize: {PageSize}",
-                specification.GetFilterSummary(), request.PageNumber, request.PageSize
+                "Executing task search with filters: {@FilterSummary}, Page: {PageNumber}, PageSize: {PageSize}, SortBy: {SortBy}",
+                specification.GetFilterSummary(), request.PageNumber, request.PageSize, request.SortBy
             );
 
             var query = _context.WorkTasks
@@ -51,13 +52,15 @@ namespace Application.Features.WorkTasks.Queries
             // Apply filters using specification
             query = specification.ApplyFilters(query);
 
+            // Apply sorting
+            query = ApplySorting(query, request.SortBy);
+
             // Get total count before pagination
             var totalCount = await query.CountAsync(cancellationToken);
             _logger.LogInformation("Total tasks matching filters: {TotalCount}", totalCount);
 
-            // Apply sorting and pagination
+            // Apply pagination
             var workTasks = await query
-                .OrderByDescending(t => t.Id)
                 .Skip((request.PageNumber - 1) * request.PageSize)
                 .Take(request.PageSize)
                 .ToListAsync(cancellationToken);
@@ -78,6 +81,22 @@ namespace Application.Features.WorkTasks.Queries
             );
 
             return response;
+        }
+
+        private IQueryable<WorkTask> ApplySorting(IQueryable<WorkTask> query, SortBy sortBy)
+        {
+            return sortBy switch
+            {
+                SortBy.IdAsc => query.OrderBy(t => t.Id),
+                SortBy.TitleAsc => query.OrderBy(t => t.Title),
+                SortBy.TitleDesc => query.OrderByDescending(t => t.Title),
+                SortBy.DueDateAsc => query.OrderBy(t => t.DueDate),
+                SortBy.DueDateDesc => query.OrderByDescending(t => t.DueDate),
+                SortBy.StatusAsc => query.OrderBy(t => t.StatusID),
+                SortBy.CreatedAsc => query.OrderBy(t => t.Id),
+                SortBy.CreatedDesc => query.OrderByDescending(t => t.Id),
+                _ => query.OrderByDescending(t => t.Id) // Default: IdDesc
+            };
         }
 
         private WorkTaskDTO MapToDTO(WorkTask workTask)

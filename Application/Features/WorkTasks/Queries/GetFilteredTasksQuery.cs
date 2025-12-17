@@ -1,4 +1,5 @@
 using Domain.DTOs;
+using Domain.Enums;
 using MediatR;
 
 namespace Application.Features.WorkTasks.Queries
@@ -12,5 +13,6 @@ namespace Application.Features.WorkTasks.Queries
         public DateTime? DueDateTo { get; set; }
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 10;
+        public SortBy SortBy { get; set; } = SortBy.IdDesc;
     }
 }
