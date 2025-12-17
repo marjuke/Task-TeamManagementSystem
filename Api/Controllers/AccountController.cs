@@ -23,8 +23,11 @@ namespace Api.Controllers
             _configuration = configuration;
         }
 
-        [AllowAnonymous]
+        /// <summary>
+        /// Register a new user (Admin only)
+        /// </summary>
         [HttpPost("register")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> RegisterUser(RegisterDTO registerDTO)
         {
             var user = new User
